@@ -24,6 +24,8 @@ Use this skill to create complete FastAPI CRUD (Create, Read, Update, Delete) op
 - Create `EntityCreate` model for POST requests (without ID)
 - Create `EntityUpdate` model for PUT/PATCH requests (optional fields)
 - Create `EntityResponse` model for responses (with ID and all fields)
+- For User models, include `hashed_password` field instead of plain `password`
+- Create separate models for signup (with password) and responses (without password exposure)
 
 ### 2. Set Up In-Memory Storage
 - Create a dictionary or list for storage
@@ -37,16 +39,20 @@ Use this skill to create complete FastAPI CRUD (Create, Read, Update, Delete) op
 - `PUT /entities/{id}` - Full update of existing entity
 - `PATCH /entities/{id}` - Partial update of existing entity
 - `DELETE /entities/{id}` - Delete entity by ID
+- For User entities, include a signup endpoint that hashes passwords and prevents duplicate emails
 
 ### 4. Implement CRUD Functions
 - Create functions for each CRUD operation
 - Include proper validation and error handling
 - Return appropriate data structures
+- For User signup, hash the password before storing and check for duplicate emails
 
 ### 5. Include Error Handling
 - Handle `404 Not Found` for missing resources
 - Handle validation errors with 422 status
 - Return appropriate error responses
+- For User signup, use 409 Conflict status for duplicate emails
+- For authentication, use 401 Unauthorized for invalid credentials
 
 ### 6. Add Dependency Injection Patterns
 - Use `Depends()` for configuration, database connections, authentication
@@ -110,6 +116,37 @@ def get_settings(config: dict = Depends(get_cached_config)):
     return config
 ```
 
+### Password Hashing Dependency
+```python
+from pwdlib import PasswordHasher
+import pwdlib.exceptions
+
+def get_password_hasher():
+    # Configure pwdlib with Argon2 algorithm for secure password hashing
+    return PasswordHasher(
+        time_cost=3,
+        memory_cost=65536,
+        parallelism=1,
+        hash_len=32,
+        salt_len=16,
+        type="argon2"
+    )
+
+def hash_password(plain_password: str, ph: PasswordHasher = Depends(get_password_hasher)):
+    return ph.hash(plain_password)
+
+def verify_password(plain_password: str, hashed_password: str, ph: PasswordHasher = Depends(get_password_hasher)) -> bool:
+    try:
+        return ph.verify(hashed_password, plain_password)
+    except pwdlib.exceptions.PWDLibError:
+        return False
+```
+
+
+## Security Patterns
+
+- Implement proper authentication and authorization
+
 ## Best Practices to Follow
 
 - Use async functions for endpoints
@@ -123,6 +160,9 @@ def get_settings(config: dict = Depends(get_cached_config)):
 - Use `@lru_cache` for expensive operations that don't change frequently
 - Use `yield` in dependencies for proper resource cleanup
 - Chain dependencies when one depends on another (e.g., logger needs config)
+
+
+
 
 ## Output Format
 

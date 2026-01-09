@@ -10,4 +10,7 @@ dependencies = [
     "pydantic-settings>=2.12.0",
     "pytest>=9.0.2",
     "sqlmodel>=0.0.31",
+    "pwdlib>=0.1.1",
+    "pydantic[email]>=2.12.5",
+    "python-jose[cryptography]>=3.5.0",
 ]

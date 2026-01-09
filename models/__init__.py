@@ -1,4 +1,5 @@
 from .task import Task, TaskCreate, TaskUpdate, TaskResponse, TaskStatus, TaskPriority
+from .user import User
 
 __all__ = [
     "Task",
@@ -6,5 +7,6 @@ __all__ = [
     "TaskUpdate",
     "TaskResponse",
     "TaskStatus",
-    "TaskPriority"
+    "TaskPriority",
+    "User"
 ]

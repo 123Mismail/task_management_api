@@ -1,3 +1,3 @@
-from . import task
+from . import task, user
 
-__all__ = ["task"]
+__all__ = ["task", "user"]

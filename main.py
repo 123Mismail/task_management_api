@@ -3,8 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
 from database import create_db_and_tables
+from models import user  # Import user model to register it with SQLModel metadata
 import routers.task
-from routers.task import router
+import routers.user
+import routers.auth
+from routers.task import router as task_router
+from routers.user import router as user_router
+from routers.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -17,7 +22,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Task Management API",
-    description="A complete task management system with CRUD operations",
+    description="A complete task management system with CRUD operations and authentication",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -32,7 +37,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(router)
+app.include_router(task_router)
+app.include_router(user_router)
+app.include_router(auth_router)
 
 
 @app.get("/")

@@ -27,6 +27,7 @@ class TaskBase(SQLModel):
 class Task(TaskBase, table=True):
     """Task database model"""
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id", nullable=False)  # Associate task with user
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
 
@@ -48,5 +49,6 @@ class TaskUpdate(SQLModel):
 class TaskResponse(TaskBase):
     """Model for API responses (includes id and timestamps)"""
     id: int
+    user_id: int  # Include user_id in response
     created_at: datetime
     updated_at: datetime
